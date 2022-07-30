@@ -26,7 +26,7 @@ dv = delta_GPS_r/dtGPS;
 a_est = (eMax/delta_GPS_r)*(1-(dv*grad_t+1)^2);
 gGPS = G*Me/rGPS^2;
 ge = G*Me/re^2;
-g_est = G*Me*(1/re - 1/rGPS)/delta_GPS_r;%(gGPS^dtGPS*ge^dte)^(1/(dtGPS + dte)); % matches a_est line 25
+g_est = (gGPS*ge)^.5;%(gGPS^dtGPS*ge^dte)^(1/(dtGPS + dte)); % matches a_est line 25
 d_error = g_est - a_est;
 p_error = 100*d_error/g_est;
 
