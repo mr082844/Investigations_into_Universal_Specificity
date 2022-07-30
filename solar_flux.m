@@ -1,5 +1,64 @@
-% testing solar gravity as light
+%% constants
 c =  299792458; % [m/s] speed of light
+h = 6.62607015e-34;% [m^2 kg / s] Planck's Constant
+G = 6.6744e-11; % [m^3/(kg s)] gravitational constant
+re = 6371000; % [m] earth's mean radius
+Me = 5.97219e24; % [kg] earth's mass
+eMax = c^2/2;
+
+%% GPS test
+dtGPS = 1; % GPS dt'
+GPSfaster = 45e-6/(24*60^2); % 45us/day faster
+dte = dtGPS - dtGPS*GPSfaster; % earth dt
+deltaGPS_t = dte-dtGPS; % 45us/day slower
+delta_GPS_r = 20200e3; % [m] GPS altitude above ground level
+rGPS = re + delta_GPS_r; % [m] GPS distance from center of earth
+drGPS = delta_GPS_r/1000;
+r = re:drGPS:rGPS;
+g = Me*G./r.^2;
+dSE = g.*drGPS;
+deltaSE = cumsum(dSE);
+dSEend = deltaSE(end);
+dt1_dt2 = dtGPS*sqrt(1-dSEend/eMax); % agrees with deltaGPS_t in line 13
+grad_t = (dt1_dt2-dtGPS)/delta_GPS_r;
+dv = delta_GPS_r/dtGPS;
+a_est = (eMax/delta_GPS_r)*(1-(dv*grad_t+1)^2);
+gGPS = G*Me/rGPS^2;
+ge = G*Me/re^2;
+g_est = (gGPS^dtGPS*ge^dte)^(1/(dtGPS + dte)); % matches a_est line 25
+
+%% twins travel together first
+dist = 1; %lt-sec
+v0 = 0.5; % percent c for both twins at start wrt original reference frame
+v1 = 0; % "moving" twin drops back to 0 wrt original reference frame (-0.5 wrt "stationary" twin)
+v2_0 = 0.1; % how fast (percent c) the "moving" twin catches back up from the twins' perspective
+v2 = (0.5 + v2_0) / (1 + 0.5*v2_0); % how fast (percent c) the "moving" twin catches back up from the original frame's perspective
+
+dts_dtp = sqrt(1-.5); % "stationary" twin's time dilation wrt original reference frame
+dt1_dtp = sqrt(1-v1); % "moving" twin's time dilation wrt original reference frame at t1
+dt2_dtp = sqrt(1-v2); % "moving" twin's time dilation wrt original reference frame at t2
+t_away = dist / v0; % how much time passes for away trip (t1-t0), in original reference frame time, to cover distance
+t_return = t_away / (v2 - v1);  % how much time passes for return trip (t2-t1), in original reference frame time, covers original distance and then some because "stationary" twin is moving at 0.5c
+total_dts = dts_dtp*(t_away + t_return); % total passing of time, from start of twin's separation, for "stationary" twin, as measured by "stationary" twin
+total_dtm = dt1_dtp*(t_away) + dt2_dtp*(t_return); % total passing of time, from start of twin's separation, for "moving" twin, as measured by "moving" twin
+
+%% space differential
+v = 0.5; % fraction of c
+fc = 1; % fraction of c
+
+dt_dtp = sqrt(1-v);
+time = 1; % light-second
+dp = 1;
+d = (fc-v) * time;
+dx_dxp = (d / dt_dtp);
+
+%% space differential 2
+v = 2; % fraction speed of light
+gamma = 1/sqrt(1-v^2);
+dx_dxp = (fc/(v*gamma));
+dx_dxp2 = sqrt(fc^2/v^2-1);
+
+%% testing solar gravity as light
 a_e2s =  0.006; % [m/s^2] acceleration of earth 2 sun
 dr  = 1e3; % [m] precision
 dt  = sqrt(2*dr/a_e2s);
@@ -16,4 +75,38 @@ E_e1 = E_sun / (Ade1);
 E_e2 = E_sun / (Ade2);
 dE_e = E_e1 - E_e2;
 a_e2s_est = dE_e / dr;
+
+%% total specific energy time dilation
+ep_emax = 1/3;
+ek_emax = sqrt(2);
+gamma_inv_SQ_ep = 1 - ep_emax;
+gamma_inv_SQ_ek = 1 - ek_emax;
+tau_SQ_ep = 1 - gamma_inv_SQ_ep;
+tau_SQ_ek = 1 - gamma_inv_SQ_ek;
+tau_SQ_eT = tau_SQ_ep + tau_SQ_ek;
+gamma_inv_SQ_eT = 1 - tau_SQ_eT;
+gamma_inv_SQ_eT2 = 1 - ep_emax - ek_emax;
+delta = gamma_inv_SQ_eT - gamma_inv_SQ_eT2;
+
+%% speed changes imperceptably
+v = [0.9:1e-5:1-1e-5];
+vp = 2*v./(1+v.^2);
+plot(v,vp,'k','LineWidth',3)
+xlabel('Velocity of Objects Going in Opposite Directions','FontSize',16);
+ylabel('Velocity of Moving Objects as Seen By Moving Objects','FontSize',16);
+grid on
+title('Changes In Speed Becomes Imperceptable When Approaching c','FontSize',16)
+
+%% mass or speed of a photon
+lambda1 = 1e-6;
+lambda2 = 11e-6;
+E1 = h*c/lambda1;
+E2 = h*c/lambda2;
+m1 = 2 * h / (lambda1*c);
+c2  = 2 * h / (lambda2*m1);
+m2 = 2 * h / (lambda2*c);
+
+%% GPS
+
+
 disp("done");
