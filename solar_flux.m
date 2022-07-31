@@ -1,3 +1,7 @@
+%% clear close
+clear
+close all
+
 %% constants
 c =  299792458; % [m/s] speed of light
 h = 6.62607015e-34;% [m^2 kg / s] Planck's Constant
@@ -6,15 +10,97 @@ re = 6371000; % [m] earth's mean radius
 Me = 5.97219e24; % [kg] earth's mass
 Ms = 333000*Me; % [kg] sun's mass
 eMax = c^2/2;
+vGalaxy = 0.581152e6; %[m/s] how fast our galaxy is moving
+
+%% wave path length for different light wave lengths
+f_green_0 = 5.45e15;
+lambda_green_0 = c/f_green_0;
+t0 = 0;
+tend = 1 / f_green_0;
+t = t0:tend/1e3:tend;
+wave0 = @(t) sin(2*pi*f_green_0*t);
+signal0 = wave0(t);
+[~,idx_max] = max(signal0);
+lambda_est = c*t(idx_max)*4;
+delta_v = c/5;
+dx_dxp=sqrt(1-(delta_v/c)^2);
+tau = delta_v/c;
+n = 1/(1-tau);
+v0 = c;
+v1 = v0/n;
+lambda_green_1 = v1 / f_green_0;
+f_green_1 = c/lambda_green_1;
+wave1 = @(t) sin(2*pi*f_green_0*t*n);
+signal1 = wave1(t);
+
+figure(1);
+plot(t*c,signal0);
+hold on
+plot(t*c,signal1,'--');
+
+S0 = sum(sqrt((signal0(2:end) - signal0(1:end-1)).^2 + (c*(t(2)-t(1)))^2));
+S1 = sum(sqrt((signal1(2:end) - signal1(1:end-1)).^2 + (c*(t(2)-t(1)))^2));
+
+%% test different dx_dxp functionsx
+dt_dtp = [0.1:1e-6:1];
+v1_p = sqrt(1-dt_dtp.^2);
+dx_dxp = sqrt(1-v1_p.^2);
+dx_dxp_weird = (1-v1_p.^2);
+dx_dt = dx_dxp_weird ./ dt_dtp;
+
+figure(1);
+subplot(3,1,1)
+plot(v1_p,v1_p.*dx_dxp_weird./dt_dtp,'k','LineWidth',3);
+grid on
+xlabel('$\frac{v''}{c}$','interpreter','latex','fontsize',20);
+ylabel('$\frac{v}{c}$','interpreter','latex','fontsize',20);
+title('$\frac{dx}{dx''}<\frac{1}{\gamma}$','interpreter','latex','fontsize',20);
+xticks([0:.1:1]);
+yticks([0:.1:1]);
+
+subplot(3,1,2)
+plot(v1_p,v1_p.*dx_dxp./dt_dtp,'k','LineWidth',3);
+grid on
+xlabel('$\frac{v''}{c}$','interpreter','latex','fontsize',20);
+ylabel('$\frac{v}{c}$','interpreter','latex','fontsize',20);
+title('$\frac{dx}{dx''}=\frac{1}{\gamma}$','interpreter','latex','fontsize',20);
+xticks([0:.1:1]);
+yticks([0:.1:1]);
+
+subplot(3,1,3)
+plot(v1_p,v1_p./dt_dtp,'k','LineWidth',3);
+grid on
+xlabel('$\frac{v''}{c}$','interpreter','latex','fontsize',20);
+ylabel('$\frac{v}{c}$','interpreter','latex','fontsize',20);
+title('$\frac{dx}{dx''}>\frac{1}{\gamma}$','interpreter','latex','fontsize',20);
+hold on
+plot([0 1],[1 1],'r--','LineWidth',2)
+xticks([0:.1:1]);
+yticks([0:1:10]);
+theselabels = yticklabels;
+theselabels{2} = 'c';
+yticklabels(theselabels);
+
+%% alpha centauri trip distance changed
+vp = 0;
+dt_dtp = 0.5;
+v1_p = sqrt(1-dt_dtp^2);
+distAS_p = 4; % [light years] approx distance to alpha centauri
+time_p = distAS/v1_p; % [years] time it takes to get there
+time_m = time_p * dt_dtp;
+distAS_m = time_m * v1_p;
+dx_dxp_mesured = distAS_m / distAS_p;
+delta_error = dx_dxp_mesured - dt_dtp;
+delta_vel = v1_p - V1_m_if;
 
 %% GPS test
 dtGPS = 1; % GPS dt'
 GPSfaster = 45e-6/(24*60^2); % 45us/day faster
 dte = dtGPS - dtGPS*GPSfaster; % earth dt
 deltaGPS_t = dte-dtGPS; % 45us/day slower
-delta_GPS_r = 1e1; % [m] GPS altitude above ground level
+delta_GPS_r = 1e3; % [m] GPS altitude above ground level
 rGPS = re + delta_GPS_r; % [m] GPS distance from center of earth
-drGPS = delta_GPS_r/1000;
+drGPS = delta_GPS_r/1e5;
 r = re:drGPS:rGPS;
 g = Me*G./r.^2;
 dSE = g.*drGPS;
@@ -36,9 +122,9 @@ mean_fr = integral(fr,2,3);
 geoMean_fr = sqrt(fr(2)*fr(3));
 %% twins travel together first
 dist = 1; %lt-sec
-v0 = 0.9; % percent c for both twins at start wrt original reference frame
-v1 = .7; % "moving" twin drops back to 0 wrt original reference frame (-0.5 wrt "stationary" twin)
-v2_0 = 0.4; % how fast (percent c) the "moving" twin catches back up from the twins' perspective
+v0 = 0.2; % percent c for both twins at start wrt original reference frame
+v1 = 0; % "moving" twin drops back to 0 wrt original reference frame (-0.5 wrt "stationary" twin)
+v2_0 = 0.2; % how fast (percent c) the "moving" twin catches back up from the twins' perspective
 v2 = (v0 + v2_0) / (1 + v0*v2_0); % how fast (percent c) the "moving" twin catches back up from the original frame's perspective
 
 dts_dtp = sqrt(1-.5); % "stationary" twin's time dilation wrt original reference frame
