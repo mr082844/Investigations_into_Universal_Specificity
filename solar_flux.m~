@@ -26,7 +26,7 @@ dv = delta_GPS_r/dtGPS;
 a_est = (eMax/delta_GPS_r)*(1-(dv*grad_t+1)^2);
 gGPS = G*Me/rGPS^2;
 ge = G*Me/re^2;
-g_est = (gGPS*ge)^.5;%(gGPS^dtGPS*ge^dte)^(1/(dtGPS + dte)); % matches a_est line 25
+g_est = G*Me*(1/re - 1/rGPS)/delta_GPS_r;%(gGPS^dtGPS*ge^dte)^(1/(dtGPS + dte)); % matches a_est line 25
 d_error = g_est - a_est;
 p_error = 100*d_error/g_est;
 
@@ -36,18 +36,21 @@ mean_fr = integral(fr,2,3);
 geoMean_fr = sqrt(fr(2)*fr(3));
 %% twins travel together first
 dist = 1; %lt-sec
-v0 = 0.5; % percent c for both twins at start wrt original reference frame
+v0 = 0.2; % percent c for both twins at start wrt original reference frame
 v1 = 0; % "moving" twin drops back to 0 wrt original reference frame (-0.5 wrt "stationary" twin)
-v2_0 = 0.1; % how fast (percent c) the "moving" twin catches back up from the twins' perspective
-v2 = (0.5 + v2_0) / (1 + 0.5*v2_0); % how fast (percent c) the "moving" twin catches back up from the original frame's perspective
+v2_0 = 0.2; % how fast (percent c) the "moving" twin catches back up from the twins' perspective
+v2 = (v0 + v2_0) / (1 + v0*v2_0); % how fast (percent c) the "moving" twin catches back up from the original frame's perspective
 
 dts_dtp = sqrt(1-.5); % "stationary" twin's time dilation wrt original reference frame
 dt1_dtp = sqrt(1-v1); % "moving" twin's time dilation wrt original reference frame at t1
 dt2_dtp = sqrt(1-v2); % "moving" twin's time dilation wrt original reference frame at t2
 t_away = dist / v0; % how much time passes for away trip (t1-t0), in original reference frame time, to cover distance
-t_return = t_away / (v2 - v1);  % how much time passes for return trip (t2-t1), in original reference frame time, covers original distance and then some because "stationary" twin is moving at 0.5c
-total_dts = dts_dtp*(t_away + t_return); % total passing of time, from start of twin's separation, for "stationary" twin, as measured by "stationary" twin
-total_dtm = dt1_dtp*(t_away) + dt2_dtp*(t_return); % total passing of time, from start of twin's separation, for "moving" twin, as measured by "moving" twin
+t_return = dist / (v2 - v0);  % how much time passes for return trip (t2-t1), in original reference frame time, covers original distance and then some because "stationary" twin is moving at 0.5c
+
+total_dts = sum(dts_dtp*[t_away  t_return]); % total passing of time, from start of twin's separation, for "stationary" twin, as measured by "stationary" twin
+total_dtm = sum([dt1_dtp*(t_away)  dt2_dtp*(t_return)]); % total passing of time, from start of twin's separation, for "moving" twin, as measured by "moving" twin
+ts = (t_away + t_return)*(1+v0*v0)*dts_dtp^-1;
+tm = t_return*(1+v2*v2)*dt2_dtp^-1;
 
 %% space differential
 v = 0.5; % fraction of c
