@@ -5,13 +5,109 @@ close all
 %% constants
 c =  299792458; % [m/s] speed of light
 h = 6.62607015e-34;% [m^2 kg / s] Planck's Constant
+kB = 5.670374419184429453970e-8; % [J?m?2?s?1?K?4] stefan-boltzmann constant
+b = 2.897771955e-3; % [m?K] Wien's displacement constant
 G = 6.6744e-11; % [m^3/(kg s)] gravitational constant
 re = 6371000; % [m] earth's mean radius
 Me = 5.97219e24; % [kg] earth's mass
 Ms = 333000*Me; % [kg] sun's mass
 eMax = c^2/2;
 vGalaxy = 0.581152e6; %[m/s] how fast our galaxy is moving
+planckl = @(lambda,T) 2*h*c^2./(lambda.^5.*(exp(h*c./(kB*lambda.*T))-1));
+planckl_odd = @(lambda,T) 2*h*c^2./(lambda.^2.*(exp(h*c./(kB*lambda.*T))-1));
+planckf = @(v,T) 2*h*v.^3./(c^2*(exp(h*v/(T))-1));
+ly_per_parsec = 26/8;
+ls_per_ly = 365*24*60*60;
+m_per_ls = c;
+m_per_parsec =  (m_per_ls * ls_per_ly * ly_per_parsec);
+c_parsec = c / m_per_parsec;
+G_parsec = G / (m_per_ls * ls_per_ly * ly_per_parsec)^3;
 
+%% refraction correction
+v = c*[0:1e-3:1-1e-3];
+n_orig = c./v;
+gamma_inv = sqrt(1-(v/c).^2);
+n_new = flip(1./gamma_inv);
+plot(n_orig, n_new);
+
+%% circular orbit speed with relativity
+Mg = 1e11*Ms; % pass of center of galaxy
+rs  = G_parsec*Mg / c_parsec^2;
+r = rs:1e-6:10;
+Ve_c = m_per_parsec*sqrt(G_parsec*Mg ./ r)/c;
+dt_dtp_P = sqrt(1-rs./r);
+Ve_c_observed = Ve_c.*dt_dtp_P;
+plot(r,Ve_c_observed);
+set(gca,'XScale','log');
+
+%% light-g ratio for different things
+photons_Sun_per_Sec = 1e45;
+obj.E.T = 287.039; % [K] average earth temperature
+% avg temps
+obj.sun.T = 5778;  % [K] average sun temperature
+obj.V.T = 737;     % [K] average venus temperature
+obj.E.T = 287.039; % [K] average earth temperature
+obj.M.T = 210.372; % [K] average mars temperature
+% https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwi4hdjByaj5AhXBGVkFHUFJAgUQFnoECBMQAw&url=https%3A%2F%2Fwww.smartconversion.com%2F(X(1))%2FotherInfo%2FTemperature_of_planets_and_the_Sun.aspx&usg=AOvVaw0FW8wH3CVfbSVkNm2ae-Z2
+obj.J.T = 165;     % [K] average Jupiter temperature
+obj.sat.T = 134;   % [K] average Saturn temperature
+obj.U.T = 76;      % [K] average Uranus temperature
+
+% avg radius
+obj.sun.r = 696.34e6; % [m] average sun radius 
+obj.V.r = 6.0518e6;   % [m] average venus radius 
+obj.E.r = re;         % [m] average earth radius 
+obj.M.r = 3.3895e6;   % [K] average mars radius
+obj.J.r = 69.911e6;   % [K] average Jupiter radius
+obj.sat.r = 58.232e6; % [K] average Saturn radius
+obj.U.r = 25.362e6;   % [K] average Uranus radius
+
+% avg mass
+obj.sun.M = 1.989e30; % [m] average sun radius 
+obj.V.M = 4.867e24;   % [m] average venus radius 
+obj.E.M = Me;         % [m] average earth radius 
+obj.M.M = 6.39e23;   % [K] average mars radius
+obj.J.M = 1.898e27;   % [K] average Jupiter radius
+obj.sat.M = 5.683e26; % [K] average Saturn radius
+obj.U.M = 8.681e25;   % [K] average Uranus radius
+
+% get peak freq, power, power density, g, pwr den/g ratio
+obj_names = fieldnames(obj);
+figure(1);
+hold off
+colors = {[0 0 0]...
+    ,     [1 1 0]...
+    ,     [1 0 1]...
+    ,     [0 1 1]...
+    ,     [1 0 0]...
+    ,     [0 1 0]...
+    ,     [0 0 1]...
+    };
+for io = 1 : length(obj_names)
+    obj_name = obj_names{io};
+    lamb_peak = (b / obj.(obj_name).T);
+    obj.(obj_name).f = c / (b / obj.(obj_name).T); % weins dispacement law to get peak freq
+    obj.(obj_name).P  = 4*pi*obj.(obj_name).r^2 * obj.(obj_name).T^4 * kB;%integral(@(x) planckf(x,obj.(obj_name).T),obj.(obj_name).f/100,obj.(obj_name).f*100);%
+    r_range = [obj.(obj_name).r:1000:obj.(obj_name).r+1e7];
+    obj.(obj_name).Pd = obj.(obj_name).P ./ (4*pi*r_range.^2);
+    obj.(obj_name).g  = G * obj.(obj_name).M ./ r_range.^2;
+    obj.(obj_name).g2pd = obj.(obj_name).g ./ obj.(obj_name).Pd;
+    obj.(obj_name).pd2g2f = (obj.(obj_name).Pd/obj.(obj_name).T^3) ./ obj.(obj_name).g;
+    yyaxis right;
+    plot(r_range-obj.(obj_name).r,obj.(obj_name).g2pd*1e3,'-','Color',colors{io},'linewidth',1);
+    yyaxis left;
+    plot(0,obj.(obj_name).T^3/1e8,'x','Color',colors{io},'linewidth',1);
+    hold on
+end
+legend(obj_names,'location','best');
+yyaxis right;
+ylabel('Power Density to Gravitational Acceleration Ratio');
+yyaxis left;
+ylabel('Temperature [K]');
+xlabel('Distant (r) away from Surface');
+set(gca,'YScale','log');
+yyaxis right;
+set(gca,'YScale','log');
 %% wave path length for different light wave lengths
 f_green_0 = 5.45e15;
 lambda_green_0 = c/f_green_0;

@@ -1,24 +1,174 @@
+%% clear close
+clear
+close all
+
 %% constants
 c =  299792458; % [m/s] speed of light
 h = 6.62607015e-34;% [m^2 kg / s] Planck's Constant
+kB = 5.670374419184429453970e-8; % [J?m?2?s?1?K?4] stefan-boltzmann constant
+b = 2.897771955e-3; % [m?K] Wien's displacement constant
 G = 6.6744e-11; % [m^3/(kg s)] gravitational constant
 re = 6371000; % [m] earth's mean radius
 Me = 5.97219e24; % [kg] earth's mass
 Ms = 333000*Me; % [kg] sun's mass
 eMax = c^2/2;
 vGalaxy = 0.581152e6; %[m/s] how fast our galaxy is moving
+planckl = @(lambda,T) 2*h*c^2./(lambda.^5.*(exp(h*c./(kB*lambda.*T))-1));
+planckl_odd = @(lambda,T) 2*h*c^2./(lambda.^2.*(exp(h*c./(kB*lambda.*T))-1));
+planckf = @(v,T) 2*h*v.^3./(c^2*(exp(h*v/(T))-1));
+ly_per_parsec = 26/8;
+ls_per_ly = 365*24*60*60;
+m_per_ls = c;
+m_per_parsec =  (m_per_ls * ls_per_ly * ly_per_parsec);
+c_parsec = c / m_per_parsec;
+G_parsec = G / (m_per_ls * ls_per_ly * ly_per_parsec)^3;
+
+%% circular orbit speed with relativity
+Mg = 1e42; % pass of center of galaxy
+rs  = G_parsec*Mg / c_parsec^2;
+r = rs:.001:800;
+Ve_c = m_per_parsec*sqrt(G_parsec*Mg ./ r)/c;
+dt_dtp_P = sqrt(1-rs./r);
+Ve_c_observed = Ve_c.*dt_dtp_P;
+plot(r,Ve_c_observed);
+set(gca,'XScale','log');
+
+%% light-g ratio for different things
+photons_Sun_per_Sec = 1e45;
+obj.E.T = 287.039; % [K] average earth temperature
+% avg temps
+obj.sun.T = 5778;  % [K] average sun temperature
+obj.V.T = 737;     % [K] average venus temperature
+obj.E.T = 287.039; % [K] average earth temperature
+obj.M.T = 210.372; % [K] average mars temperature
+% https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwi4hdjByaj5AhXBGVkFHUFJAgUQFnoECBMQAw&url=https%3A%2F%2Fwww.smartconversion.com%2F(X(1))%2FotherInfo%2FTemperature_of_planets_and_the_Sun.aspx&usg=AOvVaw0FW8wH3CVfbSVkNm2ae-Z2
+obj.J.T = 165;     % [K] average Jupiter temperature
+obj.sat.T = 134;   % [K] average Saturn temperature
+obj.U.T = 76;      % [K] average Uranus temperature
+
+% avg radius
+obj.sun.r = 696.34e6; % [m] average sun radius 
+obj.V.r = 6.0518e6;   % [m] average venus radius 
+obj.E.r = re;         % [m] average earth radius 
+obj.M.r = 3.3895e6;   % [K] average mars radius
+obj.J.r = 69.911e6;   % [K] average Jupiter radius
+obj.sat.r = 58.232e6; % [K] average Saturn radius
+obj.U.r = 25.362e6;   % [K] average Uranus radius
+
+% avg mass
+obj.sun.M = 1.989e30; % [m] average sun radius 
+obj.V.M = 4.867e24;   % [m] average venus radius 
+obj.E.M = Me;         % [m] average earth radius 
+obj.M.M = 6.39e23;   % [K] average mars radius
+obj.J.M = 1.898e27;   % [K] average Jupiter radius
+obj.sat.M = 5.683e26; % [K] average Saturn radius
+obj.U.M = 8.681e25;   % [K] average Uranus radius
+
+% get peak freq, power, power density, g, pwr den/g ratio
+obj_names = fieldnames(obj);
+figure(1);
+hold off
+colors = {[0 0 0]...
+    ,     [1 1 0]...
+    ,     [1 0 1]...
+    ,     [0 1 1]...
+    ,     [1 0 0]...
+    ,     [0 1 0]...
+    ,     [0 0 1]...
+    };
+for io = 1 : length(obj_names)
+    obj_name = obj_names{io};
+    lamb_peak = (b / obj.(obj_name).T);
+    obj.(obj_name).f = c / (b / obj.(obj_name).T); % weins dispacement law to get peak freq
+    obj.(obj_name).P  = 4*pi*obj.(obj_name).r^2 * obj.(obj_name).T^4 * kB;%integral(@(x) planckf(x,obj.(obj_name).T),obj.(obj_name).f/100,obj.(obj_name).f*100);%
+    r_range = [obj.(obj_name).r:1000:obj.(obj_name).r+1e7];
+    obj.(obj_name).Pd = obj.(obj_name).P ./ (4*pi*r_range.^2);
+    obj.(obj_name).g  = G * obj.(obj_name).M ./ r_range.^2;
+    obj.(obj_name).g2pd = obj.(obj_name).g ./ obj.(obj_name).Pd;
+    obj.(obj_name).pd2g2f = (obj.(obj_name).Pd/obj.(obj_name).T^3) ./ obj.(obj_name).g;
+    yyaxis right;
+    plot(r_range-obj.(obj_name).r,obj.(obj_name).g2pd*1e3,'-','Color',colors{io},'linewidth',1);
+    yyaxis left;
+    plot(0,obj.(obj_name).T^3/1e8,'x','Color',colors{io},'linewidth',1);
+    hold on
+end
+legend(obj_names,'location','best');
+yyaxis right;
+ylabel('Power Density to Gravitational Acceleration Ratio');
+yyaxis left;
+ylabel('Temperature [K]');
+xlabel('Distant (r) away from Surface');
+set(gca,'YScale','log');
+yyaxis right;
+set(gca,'YScale','log');
+%% wave path length for different light wave lengths
+f_green_0 = 5.45e15;
+lambda_green_0 = c/f_green_0;
+t0 = 0;
+tend = 1 / f_green_0;
+t = t0:tend/1e3:tend;
+wave0 = @(t) sin(2*pi*f_green_0*t);
+signal0 = wave0(t);
+[~,idx_max] = max(signal0);
+lambda_est = c*t(idx_max)*4;
+delta_v = c/5;
+dx_dxp=sqrt(1-(delta_v/c)^2);
+tau = delta_v/c;
+n = 1/(1-tau);
+v0 = c;
+v1 = v0/n;
+lambda_green_1 = v1 / f_green_0;
+f_green_1 = c/lambda_green_1;
+wave1 = @(t) sin(2*pi*f_green_0*t*n);
+signal1 = wave1(t);
+
+figure(1);
+plot(t*c,signal0);
+hold on
+plot(t*c,signal1,'--');
+
+S0 = sum(sqrt((signal0(2:end) - signal0(1:end-1)).^2 + (c*(t(2)-t(1)))^2));
+S1 = sum(sqrt((signal1(2:end) - signal1(1:end-1)).^2 + (c*(t(2)-t(1)))^2));
 
 %% test different dx_dxp functionsx
-dt_dtp = [0.1:0.0001:1];
+dt_dtp = [0.1:1e-6:1];
 v1_p = sqrt(1-dt_dtp.^2);
 dx_dxp = sqrt(1-v1_p.^2);
 dx_dxp_weird = (1-v1_p.^2);
 dx_dt = dx_dxp_weird ./ dt_dtp;
-figure(1);
-plot(v1_p,v1_p.*dx_dxp_weird./dt_dtp);
 
-figure(2)
-plot(v1_p,v1_p.*dx_dxp_weird./dt_dtp);
+figure(1);
+subplot(3,1,1)
+plot(v1_p,v1_p.*dx_dxp_weird./dt_dtp,'k','LineWidth',3);
+grid on
+xlabel('$\frac{v''}{c}$','interpreter','latex','fontsize',20);
+ylabel('$\frac{v}{c}$','interpreter','latex','fontsize',20);
+title('$\frac{dx}{dx''}<\frac{1}{\gamma}$','interpreter','latex','fontsize',20);
+xticks([0:.1:1]);
+yticks([0:.1:1]);
+
+subplot(3,1,2)
+plot(v1_p,v1_p.*dx_dxp./dt_dtp,'k','LineWidth',3);
+grid on
+xlabel('$\frac{v''}{c}$','interpreter','latex','fontsize',20);
+ylabel('$\frac{v}{c}$','interpreter','latex','fontsize',20);
+title('$\frac{dx}{dx''}=\frac{1}{\gamma}$','interpreter','latex','fontsize',20);
+xticks([0:.1:1]);
+yticks([0:.1:1]);
+
+subplot(3,1,3)
+plot(v1_p,v1_p./dt_dtp,'k','LineWidth',3);
+grid on
+xlabel('$\frac{v''}{c}$','interpreter','latex','fontsize',20);
+ylabel('$\frac{v}{c}$','interpreter','latex','fontsize',20);
+title('$\frac{dx}{dx''}>\frac{1}{\gamma}$','interpreter','latex','fontsize',20);
+hold on
+plot([0 1],[1 1],'r--','LineWidth',2)
+xticks([0:.1:1]);
+yticks([0:1:10]);
+theselabels = yticklabels;
+theselabels{2} = 'c';
+yticklabels(theselabels);
 
 %% alpha centauri trip distance changed
 vp = 0;
@@ -29,9 +179,6 @@ time_p = distAS/v1_p; % [years] time it takes to get there
 time_m = time_p * dt_dtp;
 distAS_m = time_m * v1_p;
 dx_dxp_mesured = distAS_m / distAS_p;
-dx_dxp = (1-v1_p^2);
-distAS_m_if = distAS * dx_dxp;
-V1_m_if = distAS_m_if / time_m;
 delta_error = dx_dxp_mesured - dt_dtp;
 delta_vel = v1_p - V1_m_if;
 
@@ -40,9 +187,9 @@ dtGPS = 1; % GPS dt'
 GPSfaster = 45e-6/(24*60^2); % 45us/day faster
 dte = dtGPS - dtGPS*GPSfaster; % earth dt
 deltaGPS_t = dte-dtGPS; % 45us/day slower
-delta_GPS_r = 1e1; % [m] GPS altitude above ground level
+delta_GPS_r = 1e3; % [m] GPS altitude above ground level
 rGPS = re + delta_GPS_r; % [m] GPS distance from center of earth
-drGPS = delta_GPS_r/1000;
+drGPS = delta_GPS_r/1e5;
 r = re:drGPS:rGPS;
 g = Me*G./r.^2;
 dSE = g.*drGPS;
