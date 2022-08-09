@@ -93,6 +93,8 @@ for io = 1 : length(obj_names)
     obj.(obj_name).g  = G * obj.(obj_name).M ./ r_range.^2;
     obj.(obj_name).g2pd = obj.(obj_name).g ./ obj.(obj_name).Pd;
     obj.(obj_name).pd2g2f = (obj.(obj_name).Pd/obj.(obj_name).T^3) ./ obj.(obj_name).g;
+    obj.(obj_name).EK_avg = obj.(obj_name).T*kB*3/2;
+    obj.(obj_name).eK_avg = obj.(obj_name).T*kB*3/(2*obj.(obj_name).M);
     yyaxis right;
     plot(r_range-obj.(obj_name).r,obj.(obj_name).g2pd*1e3,'-','Color',colors{io},'linewidth',1);
     yyaxis left;
