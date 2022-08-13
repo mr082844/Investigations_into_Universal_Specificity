@@ -23,6 +23,43 @@ m_per_parsec =  (m_per_ls * ls_per_ly * ly_per_parsec);
 c_parsec = c / m_per_parsec;
 G_parsec = G / (m_per_ls * ls_per_ly * ly_per_parsec)^3;
 
+%% graph twin ages more with same acceleration when there is more travel
+vfc = 0.5;
+ax = 0.5*(vfc)^2;
+gamma_inv = sqrt(1-ax/.5);
+tp = [0:1e-2:3]*365*24*60*60;
+x = vfc.*tp;
+t = gamma_inv.*tp;
+delta_t = tp - t;
+fig = figure(1)
+subplot(2,1,1);
+plot(x/(365*24*60*60),delta_t/(365*24*60*60),'k','LineWidth',2);
+xlabel('Distance Traveled (Light-Years)','FontSize',20);
+ylabel({'Age Difference','(Years)'},'FontSize',20);
+xticks([0:.1:3*vfc]);
+yticks([0:.1:3]);
+title('Traveling Twin at $\frac{1}{2}c$','Interpreter','latex','FontSize',20)
+grid on
+subplot(2,1,2);
+plot(zeros(size(delta_t)),delta_t/(365*24*60*60),'k','LineWidth',2);
+xlabel('Change in Acceleration From Original Profile','FontSize',20);
+ylabel({'Age Difference','(Years)'},'FontSize',20);
+yticks([0:.1:3]);
+grid on
+close(fig);
+
+%% velocity is not the cause of time dilation
+v1 = [0:.01:1];
+v2 = [v1];
+vr = (v1+v2)./(1+(v1.*v2));
+fig = figure(1);
+plot(vr,zeros(size(vr)),'k','LineWidth',2);
+xlabel('Relative Velocity (Fraction of $c$)','FontSize',20,'Interpreter','latex');
+ylabel('$\frac{dt_2}{dt_3}$','Interpreter','latex','FontSize',20);
+xticks([0:.1:3*vfc]);
+grid on
+
+
 %% refraction correction
 v = c*[0:1e-3:1-1e-3];
 n_orig = c./v;
