@@ -23,6 +23,74 @@ m_per_parsec =  (m_per_ls * ls_per_ly * ly_per_parsec);
 c_parsec = c / m_per_parsec;
 G_parsec = G / (m_per_ls * ls_per_ly * ly_per_parsec)^3;
 
+v_green = .55e-6;
+m_green = v_green * h;
+m_electron = 1e-31;
+photon_per_electron = m_electron / m_green;
+
+%% taylor series expantion of 1/gamma error
+v_c = [0:1e-3:1];
+gamma = sqrt(1-v_c.^2);
+gamma_t1 = ones(size(v_c));
+gamma_t2 = 1./(ones(size(v_c)) + 0.5*v_c.^2);
+gamma_t3 = ones(size(v_c));
+gamma_t6 = ones(size(v_c));
+n = -.5;
+p = n;
+k = 100;
+num = n;
+for i = 1 : k - 1
+    fac_i = factorial(i);
+    c_i = num/fac_i;
+    gamma_t6 = gamma_t6 + abs(c_i)*v_c.^(2*i);
+    if i <=2
+        gamma_t3 = gamma_t3 + abs(c_i)*v_c.^(2*i);
+    end
+    p = n - i;
+    num = num*p;
+end
+gamma_t3 = 1./gamma_t3;
+gamma_t6 = 1./gamma_t6;
+figure()
+subplot(2,1,1)
+plot(v_c,gamma,'k','linewidth',2);
+hold on
+plot(v_c,gamma_t1,'-r','linewidth',2);
+plot(v_c,gamma_t2,'--r','linewidth',2);
+plot(v_c,gamma_t3,'-.r','linewidth',2);
+plot(v_c,gamma_t6,':r','linewidth',2);
+plot([0 1],[gamma_t6(end) gamma_t6(end)],'--k','LineWidth',2)
+legend('$\frac{1}{\gamma}$','$1^{st}~Order$','$2^{nd}~Order$','$3^{rd}~Order$'...
+    ,'$1000^{th}~Order$','$\frac{1}{\gamma}$ Estimate @ $\frac{1}{\gamma}=1$','Location','SW'...
+    ,'fontsize',14,'interpreter','latex')
+xlabel('v/c','FontSize',20,'interpreter','latex');
+ylabel('$\frac{1}{\gamma}$ Estimate','FontSize',20,'interpreter','latex');
+title({'$\frac{1}{\gamma}$ Estimates','Taylor Series Evaluated at v/c = 0'}...
+    ,'FontSize',16,'interpreter','latex')
+grid on
+xticks([0:.1:1])
+xticklabels([0:.1:1])
+yticks([0:.1:1])
+yticklabels([0:.1:1])
+subplot(2,1,2)
+plot(v_c,(gamma_t1-gamma),'-r','linewidth',2);
+hold on
+plot(v_c,(gamma_t2-gamma),'--r','linewidth',2);
+plot(v_c,(gamma_t3-gamma),'-.r','linewidth',2);
+plot(v_c,(gamma_t6-gamma),':r','linewidth',2);
+plot([0 1],[gamma_t6(end)-gamma(end) gamma_t6(end)-gamma(end)],'--k','LineWidth',2)
+legend('$1^{st}~Order$','$2^{nd}~Order$','$3^{rd}~Order$','$1000^{th}~Order$'...
+    ,'$\frac{1}{\gamma}$ Error @ $\frac{1}{\gamma}=1$','Location','NW','fontsize',14,'interpreter','latex')
+xlabel('v/c','FontSize',20,'interpreter','latex');
+ylabel('$\frac{1}{\gamma}$ Error','FontSize',20,'interpreter','latex');
+title({'$\frac{1}{\gamma}$ Error','Taylor Series Evaluated at v/c = 0'}...
+    ,'FontSize',16,'interpreter','latex')
+grid on
+xticks([0:.1:1])
+xticklabels([0:.1:1])
+yticks([0:.1:1])
+yticklabels([0:.1:1])
+
 %% graph twin ages more with same acceleration when there is more travel
 vfc = 0.5;
 ax = 0.5*(vfc)^2;
