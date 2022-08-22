@@ -28,6 +28,27 @@ m_green = v_green * h;
 m_electron = 1e-31;
 photon_per_electron = m_electron / m_green;
 
+%% testing correction to einstiens energy-mass relationship
+% E = (1/gamma)*(1/2)*m0*c^2 + gamma*(1/2)*m0*v^2;
+v=0:1e-3:1;
+gamma = 1./sqrt(1-v.^2);
+m = 1;
+m0 = m./gamma;
+E = (1./gamma)*(1/2).*m0*1^2 + gamma*(1/2).*m0.*v.^2;
+E2 = (1./gamma.^2)*(1/2).*m*1^2 + (1/2).*m.*v.^2;
+plot(v,E,'k','LineWidth',2);
+hold on
+plot(v,E2,'g--','LineWidth',2);
+xlim([0 1]);
+ylim([0 1]);
+xlabel('v/c','Interpreter','latex','FontSize',20);
+ylabel('$E$','Interpreter','latex','FontSize',20)
+title({'Total Energy (Internal and Kinetic)','$m=\gamma m_0 = 1$'},'Interpreter','latex','FontSize',16);
+legend('$E=\frac{1}{\gamma}\frac{1}{2}m_0c^2 + \gamma \frac{1}{2}m_0v^2$'...
+    ,'$E=\frac{1}{\gamma^2}\frac{1}{2}mc^2 + \frac{1}{2}mv^2$'...
+    ,'Interpreter','latex','FontSize',16,'location','best');
+grid on
+
 %% taylor series expantion of 1/gamma error
 v_c = [0:1e-3:1];
 gamma = sqrt(1-v_c.^2);
