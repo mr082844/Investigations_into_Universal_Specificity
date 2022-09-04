@@ -28,6 +28,24 @@ m_green = v_green * h;
 m_electron = 1e-31;
 photon_per_electron = m_electron / m_green;
 
+%% twins travel together first
+dist = 1; %lt-sec
+v0 = 0.2; % percent c for both twins at start wrt original reference frame
+v1 = 0; % "moving" twin drops back to 0 wrt original reference frame (-0.5 wrt "stationary" twin)
+v2_0 = 0.2; % how fast (percent c) the "moving" twin catches back up from the twins' perspective
+v2 = (v0 + v2_0) / (1 + v0*v2_0); % how fast (percent c) the "moving" twin catches back up from the original frame's perspective
+
+dts_dtp = sqrt(1-.5); % "stationary" twin's time dilation wrt original reference frame
+dt1_dtp = sqrt(1-v1); % "moving" twin's time dilation wrt original reference frame at t1
+dt2_dtp = sqrt(1-v2); % "moving" twin's time dilation wrt original reference frame at t2
+t_away = dist / v0; % how much time passes for away trip (t1-t0), in original reference frame time, to cover distance
+t_return = dist / (v2 - v0);  % how much time passes for return trip (t2-t1), in original reference frame time, covers original distance and then some because "stationary" twin is moving at 0.5c
+
+total_dts = sum(dts_dtp*[t_away  t_return]); % total passing of time, from start of twin's separation, for "stationary" twin, as measured by "stationary" twin
+total_dtm = sum([dt1_dtp*(t_away)  dt2_dtp*(t_return)]); % total passing of time, from start of twin's separation, for "moving" twin, as measured by "moving" twin
+ts = (t_away + t_return)*(1+v0*v0)*dts_dtp^-1;
+tm = t_return*(1+v2*v2)*dt2_dtp^-1;
+
 %% testing correction to einstiens energy-mass relationship
 % E = (1/gamma)*(1/2)*m0*c^2 + gamma*(1/2)*m0*v^2;
 v=0:1e-3:1;
@@ -81,12 +99,12 @@ plot(v_c,gamma_t2,'--r','linewidth',2);
 plot(v_c,gamma_t3,'-.r','linewidth',2);
 plot(v_c,gamma_t6,':r','linewidth',2);
 plot([0 1],[gamma_t6(end) gamma_t6(end)],'--k','LineWidth',2)
-legend('$\frac{1}{\gamma}$','$1^{st}~Order$','$2^{nd}~Order$','$3^{rd}~Order$'...
+legend('$\frac{1}{\gamma}$','$0^{th}~Order$','$1^{st}~Order$','$2^{nd}~Order$'...
     ,'$1000^{th}~Order$','$\frac{1}{\gamma}$ Estimate @ $\frac{1}{\gamma}=1$','Location','SW'...
     ,'fontsize',14,'interpreter','latex')
 xlabel('v/c','FontSize',20,'interpreter','latex');
 ylabel('$\frac{1}{\gamma}$ Estimate','FontSize',20,'interpreter','latex');
-title({'$\frac{1}{\gamma}$ Estimates','Taylor Series Evaluated at v/c = 0'}...
+title({'$\frac{1}{\gamma}$ Estimates Binomial Expansion'}...
     ,'FontSize',16,'interpreter','latex')
 grid on
 xticks([0:.1:1])
@@ -100,11 +118,11 @@ plot(v_c,(gamma_t2-gamma),'--r','linewidth',2);
 plot(v_c,(gamma_t3-gamma),'-.r','linewidth',2);
 plot(v_c,(gamma_t6-gamma),':r','linewidth',2);
 plot([0 1],[gamma_t6(end)-gamma(end) gamma_t6(end)-gamma(end)],'--k','LineWidth',2)
-legend('$1^{st}~Order$','$2^{nd}~Order$','$3^{rd}~Order$','$1000^{th}~Order$'...
+legend('$0^{th}~Order$','$1^{st}~Order$','$2^{nd}~Order$','$1000^{th}~Order$'...
     ,'$\frac{1}{\gamma}$ Error @ $\frac{1}{\gamma}=1$','Location','NW','fontsize',14,'interpreter','latex')
 xlabel('v/c','FontSize',20,'interpreter','latex');
 ylabel('$\frac{1}{\gamma}$ Error','FontSize',20,'interpreter','latex');
-title({'$\frac{1}{\gamma}$ Error','Taylor Series Evaluated at v/c = 0'}...
+title({'$\frac{1}{\gamma}$ Error Binomial Expansion'}...
     ,'FontSize',16,'interpreter','latex')
 grid on
 xticks([0:.1:1])
@@ -344,23 +362,6 @@ p_error = 100*d_error/g_est;
 fr = @(x) 1 ./ x.^2;
 mean_fr = integral(fr,2,3);
 geoMean_fr = sqrt(fr(2)*fr(3));
-%% twins travel together first
-dist = 1; %lt-sec
-v0 = 0.2; % percent c for both twins at start wrt original reference frame
-v1 = 0; % "moving" twin drops back to 0 wrt original reference frame (-0.5 wrt "stationary" twin)
-v2_0 = 0.2; % how fast (percent c) the "moving" twin catches back up from the twins' perspective
-v2 = (v0 + v2_0) / (1 + v0*v2_0); % how fast (percent c) the "moving" twin catches back up from the original frame's perspective
-
-dts_dtp = sqrt(1-.5); % "stationary" twin's time dilation wrt original reference frame
-dt1_dtp = sqrt(1-v1); % "moving" twin's time dilation wrt original reference frame at t1
-dt2_dtp = sqrt(1-v2); % "moving" twin's time dilation wrt original reference frame at t2
-t_away = dist / v0; % how much time passes for away trip (t1-t0), in original reference frame time, to cover distance
-t_return = dist / (v2 - v0);  % how much time passes for return trip (t2-t1), in original reference frame time, covers original distance and then some because "stationary" twin is moving at 0.5c
-
-total_dts = sum(dts_dtp*[t_away  t_return]); % total passing of time, from start of twin's separation, for "stationary" twin, as measured by "stationary" twin
-total_dtm = sum([dt1_dtp*(t_away)  dt2_dtp*(t_return)]); % total passing of time, from start of twin's separation, for "moving" twin, as measured by "moving" twin
-ts = (t_away + t_return)*(1+v0*v0)*dts_dtp^-1;
-tm = t_return*(1+v2*v2)*dt2_dtp^-1;
 
 %% space differential
 v = 0.5; % fraction of c
