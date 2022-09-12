@@ -78,25 +78,26 @@ end
 figure(1);
 % plot the movement of each orb makes towards its pair
 subplot(2,1,1)
-hold off
 plot((d-ds)/2,(d-interp1(ts_m0,ds_m0,ts_gamma))/2,'-b','LineWidth',1.5)
-title({'Distance Each Orb Traveled Towards The Other [m]'},'fontsize',16);
+xlim([0 d/2]);
+ylim([0 d/2]);
 grid on
 xlabel('Stationary Orbs','FontSize',20);
 ylabel('Traveling Orbs','FontSize',20);
+title({'Distance Each Orb Traveled Towards The Other [m]'},'fontsize',16);
 
 % plot the percent difference in movement between pairs of orbs
 percent_difference = 100*abs((d-interp1(ts_m0,ds_m0,ts_gamma))/2 - (d-ds)/2)./(dy);
 subplot(2,1,2)
-hold off
 plot((d-ds)/2,percent_difference,'-b','LineWidth',2)
-title({'% Difference'},'fontsize',16);
+xlim([0 d/2]);
+ylim([0 100]);
 grid on
 xlabel({'Distance Each Orb in Stationary Frame'...
     ,'Traveled Towards The Other [m]'},'FontSize',20);
-ylabel({'$100\times\frac{|Traveling-Stationary|}{precision}$'}...
-    ,'FontSize',20,'Interpreter','latex');
-ylim([0 100]);
+ylabel({'\%$\Delta$'},'FontSize',20,'Interpreter','latex');
+title({'\%$\Delta=100\times\frac{|Traveling-Stationary|}{precision}$'}...
+    ,'Interpreter','latex','fontsize',16);
 
 % print ellapsed proper (AAK wall) time for each pair or orbs
 fprintf('Elapsed Time for Traveling Orbs: %0.1f [months]\n',total_time_months);
