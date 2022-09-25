@@ -160,10 +160,12 @@ v1 = [0:.01:1];
 v2 = [v1];
 vr = (v1+v2)./(1+(v1.*v2));
 fig = figure(1);
-plot(vr,ones(size(vr)),'k','LineWidth',2);
-xlabel('Relative Velocity (Fraction of $c$)','FontSize',20,'Interpreter','latex');
-ylabel('$\frac{dt_2}{dt_3}$','Interpreter','latex','FontSize',20);
+plot(vr,ones(size(vr)),'b','LineWidth',2);
+xlabel('Relative Velocity (Fraction of $c$)','FontSize',25,'Interpreter','latex');
+ylabel('$\frac{dt_1}{dt_2}$','Interpreter','latex','FontSize',20);
 xticks([0:.1:3*vfc]);
+xlim([0 1]);
+ylim([0 1]);
 grid on
 
 
