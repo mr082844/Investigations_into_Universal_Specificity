@@ -11,22 +11,22 @@ Me = 5.97219e24; % [kg] earth's mass
 Ms = 333000*Me;  % [kg] sun's mass
 
 % functions
-gamma = @(v) 1./sqrt(1-v.^2);
-UIF_vel = @(v1_in,v2_in) (v1_in+v2_in)/(1 + v1_in*v2_in);
-rel_vel = @(vUIF_in,v2_in) (v2_in-vUIF_in)/(v2_in*vUIF_in-1);
-grav_2_dt = @(g,r) sqrt(1-g*r/(.5*c^2));
+gamma       = @(v) 1./sqrt(1-v.^2);
+UIF_vel     = @(v1_in,v2_in) (v1_in+v2_in)/(1 + v1_in*v2_in);
+rel_vel     = @(vUIF_in,v2_in) (v2_in-vUIF_in)/(v2_in*vUIF_in-1);
+grav_2_dt   = @(g,r) sqrt(1-g*r/(.5*c^2));
 r_2_gravSun = @(r) G*Ms/r^2;
-gravimeter = @(dtnear_dtfar,dr) (c^2/(2*dr))*(1-(dtnear_dtfar)^2);
+gravimeter  = @(dtnear_dtfar,dr) (c^2/(2*dr))*(1-(dtnear_dtfar)^2);
 
 %% experiement case 2: travel into center of sum
 
 % set conditions
-rSunE = 152.03e9;                         % [m] distance from sun to earth
-r_measure = rSunE / 4;                    % 0.25 [AU] but in [m]
-v_sun = 0.2;                              % speed [frac of c] of sun (as seen by UIF)
-v_probe1 = 0;                             % speed [frac of c] of 1st probe (as seen by UIF)
-v_probe2 = UIF_vel(v_sun,v_sun-v_probe1); % speed [frac of c] of 2nd probe (as seen by UIF)
-gravimeter_dr = 1000;                     % [m] how far apart clocks are when stationary (as seen by UIF)
+rSunE         = 152.03e9;                      % [m] distance from sun to earth
+r_measure     = rSunE / 4;                     % 0.25 [AU] but in [m]
+v_sun         = 0.2;                           % speed [frac of c] of sun (as seen by UIF)
+v_probe1      = 0;                             % speed [frac of c] of 1st probe (as seen by UIF)
+v_probe2      = UIF_vel(v_sun,v_sun-v_probe1); % speed [frac of c] of 2nd probe (as seen by UIF)
+gravimeter_dr = 1000;                          % [m] how far apart clocks are when stationary (as seen by UIF)
 
 % determine effects on gravimeter from orbit of sun
 dr_sun        = gravimeter_dr/gamma(v_sun);          % how far appar (as seen by UIF)
