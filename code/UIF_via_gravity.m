@@ -1,12 +1,14 @@
 function UIF_via_gravity()
+% Code designed to demonstrate detecting a universal inertial reference
+% frame (UIF) is possible via experiment
 clear all
 clc
 close all
 % constants
-c  =  299792458;      % [m/s] speed of light
-G  = 6.6744e-11;      % [m^3/(kg s)] gravitational constant
+c  =  299792458; % [m/s] speed of light
+G  = 6.6744e-11; % [m^3/(kg s)] gravitational constant
 Me = 5.97219e24; % [kg] earth's mass
-Ms = 333000*Me;       % [kg] sun's mass
+Ms = 333000*Me;  % [kg] sun's mass
 
 % functions
 gamma = @(v) 1./sqrt(1-v.^2);
