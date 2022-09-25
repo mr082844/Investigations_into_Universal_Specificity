@@ -57,6 +57,8 @@ temp = [[g_m_probe2 g_m_orbit g_m_probe1]/g_m_orbit ;...
 fprintf('g(r) for probe 1: %0.2e [N/kg]\n',g_m_probe1);
 fprintf('g(r) for orbit: %0.2e [N/kg]\n',g_m_orbit);
 fprintf('g(r) for probe 2: %0.2e [N/kg]\n',g_m_probe2);
+
+% supporting function
 function dtn_dtf = frames_dtn_dtf(r_f,r_n)
 g_f       = r_2_gravSun(r_f);        % gravitational specific force at clock farthest from source (as seen by UIF and orbit)
 g_n       = r_2_gravSun(r_n);        % gravitational specific force at clock nearest to source (as seen by UIF and orbit)
