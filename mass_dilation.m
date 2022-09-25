@@ -11,23 +11,23 @@ vol     = 4*pi*r^3/3; % [m^3]    volume of each orb
 m       = rho*vol;    % [kg]     mass of each orb
 d       = 1e2;        % [m]      initial distance between orbs' surfaces
 d_min   = 2*r;        % [m]      minimum distance between center mass of orbs
-gd1     = 2*G*m/(d);  % [J/kg]   initial specific potential energy
+gd1     = 2*G*m/(d);  % [J/kg]   initial relative xspecific potential energy
 v       = 0.6;        % [-]      fraction of the speed of light of orbs
 gamma_v = gamma(v);   % [-]      1/sqrt(1-v^2/c^2)
 
 % initialize other variables
 dy  = (d-d_min)/1e4;     % increment steps to numerical solution
 ds  = d:-dy:d_min;       % all numerical steps
-gds = ones(size(ds))*gd1; % relative acceleration
+gds = ones(size(ds))*gd1;% specific potential energy
 vs  = zeros(size(ds));   % relative velocity of orbs
 ts  = zeros(size(ds));   % proper time passed
 
 % incremental solution of orb pairs relative velocity and time passed
 for id = 2 : length(ds)
-    % this relative acceleration for orbs
+    % this relative specific potential energy for orbs
     gds(id) = 2*G*m/(ds(id));
     
-    % delta relative acceleration for orbs
+    % delta relative specific potential energy for orbs
     delta_gd = gds(id)-gd1;
     
     % relative velocity between them
@@ -61,11 +61,11 @@ ts_m0  = zeros(size(ds_m0));
 
 % incremental solution of orb pairs relative velocity and time passed
 for id = 2 : length(ds_m0)
-    % this relative acceleration
-    gs_m0(id) = 2*G*m0/(ds_m0(id));
+    % this relative specific potential energy
+    gds_m0(id) = 2*G*m0/(ds_m0(id));
     
-    % delta relative acceleration
-    delta_gd_m0 = gs_m0(id)-gd1_m0;
+    % delta relative specific potential energy
+    delta_gd_m0 = gds_m0(id)-gd1_m0;
     
     % relative velocity between them
     vs_m0(id) = sqrt(2*delta_gd_m0);

@@ -160,7 +160,7 @@ v1 = [0:.01:1];
 v2 = [v1];
 vr = (v1+v2)./(1+(v1.*v2));
 fig = figure(1);
-plot(vr,zeros(size(vr)),'k','LineWidth',2);
+plot(vr,ones(size(vr)),'k','LineWidth',2);
 xlabel('Relative Velocity (Fraction of $c$)','FontSize',20,'Interpreter','latex');
 ylabel('$\frac{dt_2}{dt_3}$','Interpreter','latex','FontSize',20);
 xticks([0:.1:3*vfc]);
