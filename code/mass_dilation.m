@@ -41,44 +41,44 @@ end
 total_time_months = max(ts)*seconds2months;
 
 %% Stationary orbs
-m0      = m/gamma_v^2; % [kg]   mass of stationary orb is traveling orb's rest mass
-gd1_m0  = 2*G*m0/(d);  % [J/kg] initial specific potential energy
+my      = m/gamma_v^2; % [kg]   mass of stationary orb is traveling orb's mass
+gd1_my  = 2*G*my/(d);  % [J/kg] initial specific potential energy
 
 % time passed, as measured by stationary orbs
 ts_gamma = ts*gamma_v;
 
 % total passage of proper time until orbs contact in years and months
-total_time_months_m0  = max(ts_gamma)*seconds2months;
+total_time_months_my  = max(ts_gamma)*seconds2months;
 
-% initialize stationary orbs with mass m0 distance steps
-dy_m0 = dy;             % increment steps to numerical solution
-ds_m0 = d:-dy_m0:d_min; % all numerical steps
+% initialize stationary orbs with mass my distance steps
+dy_my = dy;             % increment steps to numerical solution
+ds_my = d:-dy_my:d_min; % all numerical steps
 
 % initialize other variables
-vs_m0  = zeros(size(ds_m0));
-gds_m0 = ones(size(ds_m0))*gd1_m0;
-ts_m0  = zeros(size(ds_m0));
+vs_my  = zeros(size(ds_my));
+gds_my = ones(size(ds_my))*gd1_my;
+ts_my  = zeros(size(ds_my));
 
 % incremental solution of orb pairs relative velocity and time passed
-for id = 2 : length(ds_m0)
+for id = 2 : length(ds_my)
     % this relative specific potential energy
-    gds_m0(id) = 2*G*m0/(ds_m0(id));
+    gds_my(id) = 2*G*my/(ds_my(id));
     
     % delta relative specific potential energy
-    delta_gd_m0 = gds_m0(id)-gd1_m0;
+    delta_gd_my = gds_my(id)-gd1_my;
     
     % relative velocity between them
-    vs_m0(id) = sqrt(2*delta_gd_m0);
+    vs_my(id) = sqrt(2*delta_gd_my);
     
     % time for distance to close by mean relative velocity
-    ts_m0(id) = ts_m0(id-1) + dy_m0/mean([vs_m0(id),vs_m0(id-1)]);
+    ts_my(id) = ts_my(id-1) + dy_my/mean([vs_my(id),vs_my(id-1)]);
 end
 
 %% Plot Results
 figure(1);
 % plot the movement of each orb makes towards its pair
 subplot(2,1,1)
-plot((d-ds)/2,(d-interp1(ts_m0,ds_m0,ts_gamma))/2,'-b','LineWidth',1.5)
+plot((d-ds)/2,(d-interp1(ts_my,ds_my,ts_gamma))/2,'-b','LineWidth',1.5)
 xlim([0 d/2]);
 ylim([0 d/2]);
 grid on
@@ -87,7 +87,7 @@ ylabel('Traveling Orbs','FontSize',20);
 title({'Distance Each Orb Traveled Towards The Other [m]'},'fontsize',16);
 
 % plot the percent difference in movement between pairs of orbs
-percent_difference = 100*abs((d-interp1(ts_m0,ds_m0,ts_gamma))/2 - (d-ds)/2)./(dy);
+percent_difference = 100*abs((d-interp1(ts_my,ds_my,ts_gamma))/2 - (d-ds)/2)./(dy);
 subplot(2,1,2)
 plot((d-ds)/2,percent_difference,'-b','LineWidth',2)
 xlim([0 d/2]);
@@ -101,4 +101,4 @@ title({'\%$\Delta=100\times\frac{|Traveling-Stationary|}{precision}$'}...
 
 % print ellapsed proper (AAK wall) time for each pair or orbs
 fprintf('Elapsed Time for Traveling Orbs: %0.1f [months]\n',total_time_months);
-fprintf('Elapsed Time for Stationary Orbs: %0.1f [months]\n',total_time_months_m0);
+fprintf('Elapsed Time for Stationary Orbs: %0.1f [months]\n',total_time_months_my);
