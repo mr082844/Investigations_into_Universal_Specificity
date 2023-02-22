@@ -92,7 +92,6 @@ grid on
 a = get(gca,'XTickLabel');
 set(gca,'XTickLabel',a,'fontsize',16)
 xticks([0:.1:1]);
-title({'UIF Detection Gravimeter Experiment'},'fontsize',16);
 annotation(fig, 'textbox', [.13 .10 .8 .2], 'String'...
     ,sprintf('Mass of massed object: %d [Solar Masses]',M_MO/Ms)...
     ,'EdgeColor','none','FontSize',14);
