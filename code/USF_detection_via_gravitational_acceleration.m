@@ -1,5 +1,5 @@
-% Code designed to demonstrate detection of universal inertial frame (UIF)
-function UIF_via_gravity()
+% Code designed to demonstrate detection of universally stationary frame (USF)
+function USF_via_gravity()
 %% initializations, constants and simple functions
 % initialization
 clear all
@@ -34,37 +34,37 @@ gr_probe1_all = [];
 gr_probe2_all = [];
 
 % loop through range of MO velocities
-v_obj_all = [0:0.01:0.99 0.99:0.001:0.999]; % [frac of c] speed of MO (in UIF)
+v_obj_all = [0:0.01:0.99 0.99:0.001:0.999]; % [frac of c] speed of MO (in USF)
 for ivo = 1 : length(v_obj_all)
-    % (in UIF)
+    % (in USF)
     v_obj         = v_obj_all(ivo);           % [frac of c] velocity of MO
     v_p1          = add_vel(v_obj,probe_dv);  % [frac of c] velocity of probe1
     v_p2          = add_vel(v_obj,-probe_dv); % [frac of c] velocity of probe2
-    drUIF_drp_obj = gamma(v_obj);             % [-] kinetic differential for MO
-    drUIF_drp_p1  = gamma(v_p1);              % [-] kinetic differential for probe1
-    drUIF_drp_p2  = gamma(v_p2);              % [-] kinetic differential for probe2
+    drUSF_drp_obj = gamma(v_obj);             % [-] kinetic differential for MO
+    drUSF_drp_p1  = gamma(v_p1);              % [-] kinetic differential for probe1
+    drUSF_drp_p2  = gamma(v_p2);              % [-] kinetic differential for probe2
     
-    % determine kinetic time/space dilation effects on grivimeters (in UIF)
-    gmtr_dr_UIF_obj = gmtr_dr/drUIF_drp_obj; % [m] clocks distance apart
-    gmtr_dr_UIF_p1  = gmtr_dr/drUIF_drp_p1;  % [m] clocks distance apart
-    gmtr_dr_UIF_p2  = gmtr_dr/drUIF_drp_p2;  % [m] clocks distance apart
+    % determine kinetic time/space dilation effects on grivimeters (in USF)
+    gmtr_dr_USF_obj = gmtr_dr/drUSF_drp_obj; % [m] clocks distance apart
+    gmtr_dr_USF_p1  = gmtr_dr/drUSF_drp_p1;  % [m] clocks distance apart
+    gmtr_dr_USF_p2  = gmtr_dr/drUSF_drp_p2;  % [m] clocks distance apart
     
     % determine effects on gravimeter from orbit of MO (in  MO frame)
-    dr_obit       = drUIF_drp_obj*gmtr_dr_UIF_obj;       % [m] clocks distance apart
+    dr_obit       = drUSF_drp_obj*gmtr_dr_USF_obj;       % [m] clocks distance apart
     r_f_orbit     = r_measure+dr_obit;                   % [m] farthest clock distance to MO
     r_n_orbit     = r_measure;                           % [m] nearest clock distance to MO
     dtn_dtf_orbit = frames_dtn_dtf(r_f_orbit,r_n_orbit); % [-] clock differential
     g_m_orbit     = gravimeter(dtn_dtf_orbit,gmtr_dr);   % [m/s^2] measured g
     
     % determine effects on gravimeter from probe 1 (in  MO frame)
-    dr_p1          = drUIF_drp_obj*gmtr_dr_UIF_p1;          % [m] clocks distance apart
+    dr_p1          = drUSF_drp_obj*gmtr_dr_USF_p1;          % [m] clocks distance apart
     r_f_probe1     = r_measure+dr_p1;                       % [m] farthest clock distance to MO
     r_n_probe1     = r_measure;                             % [m] nearest clock distance to MO
     dtn_dtf_probe1 = frames_dtn_dtf(r_f_probe1,r_n_probe1); % [-] clock differential
     g_m_probe1     = gravimeter(dtn_dtf_probe1,gmtr_dr);    % [m/s^2] measured g
     
     % determine effects on gravimeter from probe 2 (in  MO frame)
-    dr_probe2      = drUIF_drp_obj*gmtr_dr_UIF_p2;          % [m] clocks distance apart
+    dr_probe2      = drUSF_drp_obj*gmtr_dr_USF_p2;          % [m] clocks distance apart
     r_f_probe2     = r_measure+dr_probe2;                   % [m] farthest clock distance to MO
     r_n_probe2     = r_measure;                             % [m] nearest clock distance to MO
     dtn_dtf_probe2 = frames_dtn_dtf(r_f_probe2,r_n_probe2); % [-] clock differential
@@ -86,7 +86,7 @@ plot(v_obj_all, gr_probe2_all,'LineWidth',2);
 
 % clean up plot
 legend('Orbital g(r)','Gravimeter1 g(r)','Gravimeter2 g(r)','FontSize',16,'location','NW');
-xlabel({'Dimensional Velocity of Massed Object [fraction of c]','With Respect to UIF'},'FontSize',16);
+xlabel({'Dimensional Velocity of Massed Object [fraction of c]','With Respect to USF'},'FontSize',16);
 ylabel('Measured $g(r)~\left[\frac{m}{s^2}\right]$','FontSize',16,'Interpreter','latex');
 grid on
 a = get(gca,'XTickLabel');
