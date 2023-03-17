@@ -49,21 +49,15 @@ for ivo = 1 : length(v_obj_all)
     % determine miscalibration effects on grivimeters (in MO frame)
     dr_p1_MO  = dr_orb_MO*drp_p1_drp_obj; % [m] clocks distance apart
     dr_p2_MO  = dr_orb_MO*drp_p2_drp_obj; % [m] clocks distance apart
-    dr_est_MO = dr_orb_MO/gamma(probe_dv);   % [m] clocks distance apart
     
     % determine distance traversal effects (in MO frame)
-    c_fn_orb   = c;                                % miscalibrated effective speed of light
     c_fn_p1    = c*drp_p1_drp_obj^-2*(1-v_p1);     % miscalibrated effective speed of light
     c_fn_p2    = c*drp_p1_drp_obj^-2*(1+v_p2);     % miscalibrated effective speed of light
-    c_fn_est   = gamma(probe_dv)^2*c*(1-probe_dv); % miscalibrated effective speed of light
-    dt_add_orb = dr_orb_MO/c_fn_orb;               % traversal time (small compared to integration)
     dt_add_p1  = dr_p1_MO/c_fn_p1;                 % traversal time (small compared to integration)
     dt_add_p2  = dr_p2_MO/c_fn_p2;                 % traversal time (small compared to integration)
-    dt_add_est = dr_est_MO/c_fn_p2;                % traversal time (small compared to integration)
     dr_add_orb = 0;
     dr_add_p1  = dt_add_p1*probe_dv*c;     % traversal additional distance (constant)
     dr_add_p2  = dt_add_p2*probe_dv*c;     % traversal additional distance (constant)
-    dr_add_est = dt_add_est*probe_dv*c;    % traversal additional distance (constant)
     
     % determine effects on gravimeter from orbit of MO (in  MO frame)
     r_f_orbit     = r_measure+dr_orb_MO+dr_add_orb;      % [m] farthest clock distance to MO
@@ -118,6 +112,7 @@ annotation(fig, 'textbox', [.13 .01 .8 .2], 'String'...
     ,sprintf('Speed of probes relative to massed object: %0.1f [fraction of c]',probe_dv)...
     ,'EdgeColor','none','FontSize',14);
 set(gca,'YScale','log')
+ylim([10^0 10^4]);
 
 %% supporting function
     function dtn_dtf = frames_dtn_dtf(r_f,r_n)
