@@ -8,10 +8,10 @@ rel_vel = @(vUIF_in,v2_in) (v2_in-vUIF_in)/(v2_in*vUIF_in-1);
 %% twins start from shared accelerated Frame
 
 % given (all in UIF's perspective)
-v1_1 = .4;   % 1st twin's travel speed as v/c (as seen by UIF)
-v1_2 = .4;   % 1st twin's travel speed as v/c (as seen by UIF)
-v2_1 = 0;  % second twin's travel speed period dt1 as v/c (as seen by UIF)
-v2_2 = UIF_vel(v1_1,v1_1); % second twin's travel speed period dt2 as v/c (as seen by UIF)
+v1_1 = 0.5;   % 1st twin's travel speed as v/c (as seen by UIF)
+v1_2 = 0.5;   % 1st twin's travel speed as v/c (as seen by UIF)
+v2_1 = 0.8;  % second twin's travel speed period dt1 as v/c (as seen by UIF)
+v2_2 = 0;%UIF_vel(v1_1,v1_1); % second twin's travel speed period dt2 as v/c (as seen by UIF)
 dtp_1 = 5; % seconds after 1st twin starts travel until dt2 starts starts (as seen by UIF)
 
 % determined (all in UIF's perspective)
