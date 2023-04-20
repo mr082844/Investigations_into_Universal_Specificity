@@ -7,11 +7,12 @@ These investigations into the theory of universal specificity found a proper con
 1. What is time?
 2. Implications of a USF
 3. Inducing the Cause of Kinetic Time Dilation
-4. Revisiting the Mass Model Assumed by E=mc^2
+4. Relativisitic Specific Energy Model
 5. The Effect of a Time Dilation Gradient
-6. Inducing the Cause of Total Time Dilation & Total Energy's Relation to Potential Energy
-7. Determining Which Frame is the USF
-8. The Theory of Everything... That is Light
+6. Inducing the Cause of Total Time Dilation & Its Relation to Total Specific Energy
+7. Relating Specific Energy to Energy
+8. Determining Which Frame is the USF
+9. The Theory of Everything... That is Light
 
 # Code:
 Suplimental code exists to support these investigations in the code directory.
