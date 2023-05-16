@@ -7,7 +7,7 @@ These investigations into the theory of universal specificity found a proper con
 1. What is time?
 2. Implications of a USF
 3. Inducing the Cause of Kinetic Time Dilation
-4. Relativisitic Specific Energy Model
+4. Relativistic Specific Energy Model
 5. The Effect of a Time Dilation Gradient
 6. Inducing the Cause of Total Time Dilation & Its Relation to Total Specific Energy
 7. Relating Specific Energy to Energy
@@ -15,4 +15,4 @@ These investigations into the theory of universal specificity found a proper con
 9. The Theory of Everything... That is Light
 
 # Code:
-Suplimental code exists to support these investigations in the code directory.
+Supplemental code exists to support these investigations in the code directory.
